@@ -1,9 +1,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-def create_app():
+def create_app(config_overides=None):
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+    if config_overides:
+        app.config.update(config_overides)
 
     from todo.models import db
     from todo.models.todo import Todo
