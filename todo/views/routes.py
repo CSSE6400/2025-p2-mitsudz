@@ -25,9 +25,29 @@ def health():
 def get_todos():
     """Return the list of todo items"""
     todos = Todo.query.all()
+    # completed = request.json.get('completed', None)
+    # window = request.json.get('window', None)
+
+    # # Error check request:
+    # if completed is not None and not isinstance(completed, bool):
+    #     return jsonify({'error' : 'completed must be a boolean'}), 400
+    # if window is not None:
+    #     try: window = int(window)
+    #     except ValueError: return jsonify({'error' : 'window must be an integer'}), 400
+
+    # Filter todos
     result = []
     for todo in todos:
+        # # Check completion status
+        # if completed is not None and todo.completed != completed:
+        #     continue
+        # # Check deadline window
+        # if window is not None:
+        #     if todo.deadline_at is None: continue
+        #     rem = (todo.deadline_at - datetime.utcnow()).days
+        #     if rem > window or rem < 0: continue
         result.append(todo.to_dict())
+
     return jsonify(result)
 
 @api.route('/todos/<int:todo_id>', methods=['GET'])
@@ -56,9 +76,13 @@ def create_todo():
 @api.route('/todos/<int:todo_id>', methods=['PUT'])
 def update_todo(todo_id):
     """Update a todo item and return the updated item"""
+    allowed = {'title', 'description', 'completed', 'deadline_at'}
     todo = Todo.query.get(todo_id)
     if todo is None:
         return jsonify({'error' : 'Todo not found'}), 404
+    
+    if len(set(request.json.keys()) - allowed) > 0:
+        return jsonify({'error' : "created_at and updated_at cannot be updated"}), 400
     
     todo.title = request.json.get('title', todo.title)
     todo.description = request.json.get('description', todo.description)
@@ -74,7 +98,7 @@ def delete_todo(todo_id):
     """Delete a todo item and return the deleted item"""
     todo = Todo.query.get(todo_id)
     if todo is None:
-        return jsonify({'error' : 'Todo not found'}), 404
+        return '', 200
     
     db.session.delete(todo)
     db.session.commit()
