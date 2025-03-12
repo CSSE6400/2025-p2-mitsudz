@@ -11,3 +11,4 @@ including how to run it.
 There are [resources](https://www.makeareadme.com) available to help you write a good README file.
 
 
+- Use poetry install --no-root to set up the directory with pyproject.toml that is already there

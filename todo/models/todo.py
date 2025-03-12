@@ -1,0 +1,36 @@
+import datetime
+from . import db
+
+class Todo(db.Model):
+    __tablename__ = "todos"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=False)
+    description = db.Column(db.String(120), nullable=True)
+    completed = db.Column(db.Boolean, nullable=False, default=False)
+    deadline_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(
+        db.DateTime, 
+        nullable=False, 
+        default=datetime.datetime.utcnow
+    )
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.utcnow
+    )
+
+    def to_dict(self):
+        return {
+            'id' : self.id,
+            'title' : self.title,
+            'description' : self.description,
+            'completed' : self.completed,
+            'deadline_at' : self.deadline_at.iso_format() if self.deadline_at else None,
+            'created_at' : self.created_at.iso_format() if self.created_at else None,
+            'updated_at' : self.updated_at.iso_format() if self.updated_at else None,
+         }
+
+    def __repr__(self):
+        return f'<Todo {self.id} {self.title}>'
