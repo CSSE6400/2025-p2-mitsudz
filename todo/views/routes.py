@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from todo.models import db
 from todo.models.todo import Todo
 from datetime import datetime
- 
+
 api = Blueprint('api', __name__, url_prefix='/api/v1') 
 
 TEST_ITEM = {
@@ -19,7 +19,6 @@ TEST_ITEM = {
 def health():
     """Return a status of 'ok' if the server is running and listening to request"""
     return jsonify({"status": "ok"})
-
 
 @api.route('/todos', methods=['GET'])
 def get_todos():
@@ -56,11 +55,19 @@ def get_todo(todo_id):
     todo = Todo.query.get(todo_id)
     if todo is None:
         return jsonify({'error' : 'Todo not found'}), 404
-    return jsonify(todo)
+    return jsonify(todo.to_dict())
 
 @api.route('/todos', methods=['POST'])
 def create_todo():
     """Create a new todo item and return the created item"""
+    # Error checking request:
+    alllowed = {'title', 'description', 'completed', 'deadline_at'}
+    if len(set(request.json.keys()) - alllowed) > 0:
+        return jsonify({'error' : 'Invalid keys'}), 400
+    if 'title' not in request.json:
+        return jsonify({'error' : 'title is required'}), 400
+
+    # Create todo:
     todo = Todo(
         title=request.json.get('title'),
         description=request.json.get('description'),
