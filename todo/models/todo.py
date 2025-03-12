@@ -27,9 +27,9 @@ class Todo(db.Model):
             'title' : self.title,
             'description' : self.description,
             'completed' : self.completed,
-            'deadline_at' : self.deadline_at.iso_format() if self.deadline_at else None,
-            'created_at' : self.created_at.iso_format() if self.created_at else None,
-            'updated_at' : self.updated_at.iso_format() if self.updated_at else None,
+            'deadline_at' : self.deadline_at.isoformat() if self.deadline_at else None,
+            'created_at' : self.created_at.isoformat() if self.created_at else None,
+            'updated_at' : self.updated_at.isoformat() if self.updated_at else None,
          }
 
     def __repr__(self):
