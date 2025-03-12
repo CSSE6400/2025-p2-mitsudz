@@ -23,28 +23,32 @@ def health():
 @api.route('/todos', methods=['GET'])
 def get_todos():
     """Return the list of todo items"""
-    todos = Todo.query.all()
-    # completed = request.json.get('completed', None)
-    # window = request.json.get('window', None)
+    # Error check request:
+    completed = request.args.get('completed', None)
+    comp_map = {'true': True, 'false': False}
+    if completed is not None:
+        if completed.lower() not in comp_map:
+            return jsonify({'error' : 'completed must be a boolean'}), 400
+        completed = comp_map[completed.lower()]
 
-    # # Error check request:
-    # if completed is not None and not isinstance(completed, bool):
-    #     return jsonify({'error' : 'completed must be a boolean'}), 400
-    # if window is not None:
-    #     try: window = int(window)
-    #     except ValueError: return jsonify({'error' : 'window must be an integer'}), 400
+    window = request.args.get('window', None)
+    if window is not None:
+        try: window = int(window)
+        except ValueError: return jsonify({'error' : 'window must be an integer'}), 400
 
     # Filter todos
+    todos = Todo.query.all()
     result = []
     for todo in todos:
-        # # Check completion status
-        # if completed is not None and todo.completed != completed:
-        #     continue
-        # # Check deadline window
-        # if window is not None:
-        #     if todo.deadline_at is None: continue
-        #     rem = (todo.deadline_at - datetime.utcnow()).days
-        #     if rem > window or rem < 0: continue
+        # Check completion status
+        if completed is not None and todo.completed != completed:
+            continue
+        # Check deadline window
+        if window is not None:
+            if todo.deadline_at is None: continue
+            if (todo.deadline_at - datetime.utcnow()).days > window: continue
+        
+        # Add to return values
         result.append(todo.to_dict())
 
     return jsonify(result)

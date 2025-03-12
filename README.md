@@ -12,3 +12,4 @@ There are [resources](https://www.makeareadme.com) available to help you write a
 
 
 - Use poetry install --no-root to set up the directory with pyproject.toml that is already there
+- when we send a http request, if we use content type headers we can send json, if we just use inside the url something like ?completed=true this is an optional parameter that goes into request.args and not request.json.
